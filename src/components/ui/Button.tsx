@@ -5,7 +5,7 @@ import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
