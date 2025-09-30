@@ -330,7 +330,7 @@ export default function AdminBillsPage() {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         申请人
                       </label>
-                      <p className="text-gray-900 dark:text-white">{selectedBill.user.name}</p>
+                      <p className="text-gray-900 dark:text-white">{selectedBill?.user?.name || '未知用户'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
