@@ -9,7 +9,7 @@ import {
   Save, 
   AlertCircle,
   CheckCircle2,
-  IdCard,
+  FileText,
   QrCode
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -326,7 +326,7 @@ export default function PaymentInfoPage() {
                       
                       <Input
                         label="身份证号"
-                        icon={IdCard}
+                        icon={FileText}
                         placeholder="请输入身份证号"
                         error={errors.id_card?.message}
                         {...register('id_card', {

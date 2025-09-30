@@ -5,9 +5,6 @@ const nextConfig = {
     domains: ['localhost'],
     unoptimized: true
   },
-  experimental: {
-    appDir: true
-  },
   env: {
     CUSTOM_KEY: 'my-value',
   },

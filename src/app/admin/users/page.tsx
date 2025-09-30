@@ -35,15 +35,15 @@ export default function AdminUsersPage() {
   const loadUsers = async (params?: SearchParams) => {
     try {
       setLoading(true);
-      const userData = await DataService.user.getUsers(params);
+      const userData: User[] = await DataService.user.getUsers(params);
       setUsers(userData);
       
       // 计算统计数据
       setStats({
         totalUsers: userData.length,
-        adminUsers: userData.filter(u => u.role === 'admin').length,
-        normalUsers: userData.filter(u => u.role === 'user').length,
-        activeUsers: userData.filter(u => u.status === 'active').length
+        adminUsers: userData.filter((u: User) => u.role === 'admin').length,
+        normalUsers: userData.filter((u: User) => u.role === 'user').length,
+        activeUsers: userData.filter((u: User) => u.status === 'active').length
       });
     } catch (error: any) {
       toast.error(error.message || '加载用户列表失败');
