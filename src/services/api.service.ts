@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { API_CONFIG, API_ENDPOINTS, HTTP_STATUS, ERROR_MESSAGES } from '../config';
-import { ApiResponse } from '../types';
+import { ApiResponse, ApiErrorResponse } from '../types';
 import toast from 'react-hot-toast';
 
 // 创建 axios 实例
@@ -71,6 +71,8 @@ class ApiService {
 
     if (error.response) {
       const status = error.response.status;
+      const errorData = error.response.data as ApiErrorResponse;
+      
       switch (status) {
         case HTTP_STATUS.UNAUTHORIZED:
           message = ERROR_MESSAGES.UNAUTHORIZED;
@@ -87,13 +89,13 @@ class ApiService {
           message = ERROR_MESSAGES.NOT_FOUND;
           break;
         case HTTP_STATUS.BAD_REQUEST:
-          message = error.response.data?.message || ERROR_MESSAGES.VALIDATION_ERROR;
+          message = errorData?.message || ERROR_MESSAGES.VALIDATION_ERROR;
           break;
         case HTTP_STATUS.INTERNAL_SERVER_ERROR:
           message = ERROR_MESSAGES.SERVER_ERROR;
           break;
         default:
-          message = error.response.data?.message || ERROR_MESSAGES.NETWORK_ERROR;
+          message = errorData?.message || ERROR_MESSAGES.NETWORK_ERROR;
       }
     }
 

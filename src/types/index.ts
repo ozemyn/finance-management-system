@@ -84,6 +84,13 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
+// API错误响应类型
+export interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+  details?: any;
+}
+
 export interface PaginatedResponse<T> {
   success: boolean;
   data: T[];
