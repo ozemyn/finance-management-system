@@ -28,7 +28,7 @@ export class BillService {
       bills = bills.map(bill => ({
         ...bill,
         user: MOCK_USERS.find(user => user.id === bill.user_id)
-      }));
+      } as Bill));
       
       // 模拟筛选
       if (params?.user_id) {
@@ -67,7 +67,7 @@ export class BillService {
       return {
         ...bill,
         user: MOCK_USERS.find(user => user.id === bill.user_id)
-      };
+      } as Bill;
     }
     
     const response = await apiService.get<Bill>(`/bills/${id}`);
@@ -127,7 +127,7 @@ export class BillService {
         approved_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         user: MOCK_USERS.find(user => user.id === bill.user_id)
-      };
+      } as Bill;
     }
     
     const response = await apiService.post<Bill>(`/bills/${id}/approve`);
@@ -149,7 +149,7 @@ export class BillService {
         updated_at: new Date().toISOString(),
         remark: reason || bill.remark,
         user: MOCK_USERS.find(user => user.id === bill.user_id)
-      };
+      } as Bill;
     }
     
     const response = await apiService.post<Bill>(`/bills/${id}/reject`, { reason });
@@ -182,7 +182,7 @@ export class BillService {
           bills: userBills.map(bill => ({
             ...bill,
             user
-          }))
+          } as Bill))
         };
       }).filter(stat => stat.bill_count > 0);
       

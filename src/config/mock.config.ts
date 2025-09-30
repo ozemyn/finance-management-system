@@ -1,4 +1,6 @@
 // 虚拟数据配置 - 用于前端独立测试
+import { Bill } from '../types';
+
 export const API_CONFIG = {
   USE_MOCK_DATA: true,
   BASE_URL: 'http://localhost:3001/api', // 后端API地址（当USE_MOCK_DATA为false时使用）
@@ -138,7 +140,7 @@ export const MOCK_USERS = [
 ];
 
 // 虚拟账单数据
-export const MOCK_BILLS = [
+export const MOCK_BILLS: Omit<Bill, 'user'>[] = [
   {
     id: 1,
     user_id: 2,
