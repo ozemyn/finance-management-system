@@ -236,6 +236,20 @@ export class BillService {
     });
     return response.data as Blob;
   }
+
+  // 导出账单
+  static async exportBills(params: { startDate: string; endDate: string }): Promise<Blob> {
+    if (API_CONFIG.USE_MOCK_DATA) {
+      await delay(1500);
+      // 模拟返回一个空的 PDF Blob
+      return new Blob(['Mock PDF content'], { type: 'application/pdf' });
+    }
+    
+    const response = await apiService.get<Blob>('/bills/export', params, {
+      responseType: 'blob'
+    });
+    return new Blob([response.data!], { type: 'application/pdf' });
+  }
 }
 
 // 文件上传服务
