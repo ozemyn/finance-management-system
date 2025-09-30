@@ -15,8 +15,8 @@ import {
   PlusCircle,
   Eye
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { MenuItem } from '../../types';
+import { useAuth } from '@/hooks/useAuth';
+import { MenuItem } from '@/types';
 
 interface SidebarProps {
   isOpen?: boolean;

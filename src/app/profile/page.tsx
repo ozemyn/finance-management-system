@@ -11,10 +11,10 @@ import {
   Button, 
   Input, 
   Loading 
-} from '../../components';
-import { useAuth } from '../../hooks/useAuth';
-import { DataService } from '../../services';
-import { ProfileUpdateData } from '../../types';
+} from '@/components';
+import { useAuth } from '@/hooks/useAuth';
+import { DataService } from '@/services';
+import { ProfileUpdateData } from '@/types';
 import toast from 'react-hot-toast';
 
 export default function ProfilePage() {

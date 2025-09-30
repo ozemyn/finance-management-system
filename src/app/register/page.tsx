@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { User, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
-import { AuthLayout, Button, Input } from '../../components';
-import { useAuth } from '../../hooks/useAuth';
-import { RegisterData } from '../../types';
+import { AuthLayout, Button, Input } from '@/components';
+import { useAuth } from '@/hooks/useAuth';
+import { RegisterData } from '@/types';
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuth();

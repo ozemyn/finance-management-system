@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { AuthLayout, Button, Input } from '../../components';
-import { useAuth } from '../../hooks/useAuth';
-import { LoginCredentials } from '../../types';
+import { AuthLayout, Button, Input } from '@/components';
+import { useAuth } from '@/hooks/useAuth';
+import { LoginCredentials } from '@/types';
 
 export default function LoginPage() {
   const { login } = useAuth();

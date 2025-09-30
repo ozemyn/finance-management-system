@@ -13,9 +13,9 @@ import {
   Table,
   Modal,
   Loading
-} from '../../components';
-import { DataService } from '../../services';
-import { User, SearchParams } from '../../types';
+} from '@/components';
+import { DataService } from '@/services';
+import { User, SearchParams } from '@/types';
 import toast from 'react-hot-toast';
 
 export default function AdminUsersPage() {
