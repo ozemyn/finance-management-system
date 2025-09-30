@@ -50,7 +50,7 @@ export class BillService {
       // 按创建时间倒序排列
       bills.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
-      return bills;
+      return bills as Bill[];
     }
     
     const response = await apiService.get<Bill[]>('/bills', params);
