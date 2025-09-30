@@ -5,6 +5,7 @@ import { User, LoginCredentials, RegisterData, AuthResponse } from '../types';
 import { DataService } from '../services';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { ROUTES, getDefaultHomePage } from '../constants/routes';
 
 interface AuthContextType {
   user: User | null;
@@ -62,26 +63,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setLoading(true);
-      const response: AuthResponse = await DataService.auth.login(credentials);
+      const response = await DataService.auth.login(credentials);
+      setUser(response.user);
+      localStorage.setItem('finance_system_token', response.token);
+      localStorage.setItem('finance_system_user', JSON.stringify(response.user));
       
-      if (response.success) {
-        // 保存登录信息
-        localStorage.setItem('finance_system_token', response.token);
-        localStorage.setItem('finance_system_user', JSON.stringify(response.user));
-        setUser(response.user);
-        
-        toast.success(response.message || '登录成功');
-        
-        // 根据用户角色跳转
-        if (response.user.role === 'admin') {
-          router.push('/admin/users');
-        } else {
-          router.push('/profile');
-        }
-      }
+      // 登录成功后跳转到对应角色的首页
+      router.replace(getDefaultHomePage(response.user.role));
+      
+      toast.success('登录成功');
     } catch (error: any) {
       toast.error(error.message || '登录失败');
       throw error;
@@ -102,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(response.user);
         
         toast.success(response.message || '注册成功');
-        router.push('/profile');
+        router.push(ROUTES.USER.PROFILE);
       }
     } catch (error: any) {
       toast.error(error.message || '注册失败');
@@ -123,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('finance_system_user');
       setUser(null);
       toast.success('已退出登录');
-      router.push('/login');
+      router.push(ROUTES.LOGIN);
     }
   };
 

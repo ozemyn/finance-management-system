@@ -25,10 +25,13 @@ export class BillService {
       let bills = [...MOCK_BILLS];
       
       // 模拟用户信息
-      bills = bills.map(bill => ({
-        ...bill,
-        user: MOCK_USERS.find(user => user.id === bill.user_id)
-      } as Bill));
+      bills = bills.map(bill => {
+        const mappedBill = {
+          ...bill,
+          user: MOCK_USERS.find(user => user.id === bill.user_id)
+        };
+        return mappedBill;
+      });
       
       // 模拟筛选
       if (params?.user_id) {
@@ -50,7 +53,7 @@ export class BillService {
       // 按创建时间倒序排列
       bills.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
-      return bills as Bill[];
+      return bills;
     }
     
     const response = await apiService.get<Bill[]>('/bills', params);
@@ -83,8 +86,8 @@ export class BillService {
         id: MOCK_BILLS.length + 1,
         user_id: data.user_id || 1,
         amount: data.amount,
-        status: data.user_id ? 'completed' : 'pending', // 管理员创建直接完成，用户申请待审核
-        type: data.user_id ? 'admin_payment' : 'user_application',
+        status: (data.user_id ? 'completed' : 'pending') as 'completed' | 'pending', // 管理员创建直接完成，用户申请待审核
+        type: (data.user_id ? 'admin_payment' : 'user_application') as 'admin_payment' | 'user_application',
         payment_attachment: '/uploads/payments/mock_payment.jpg',
         proof_image: '/uploads/proofs/mock_proof.jpg',
         created_at: new Date().toISOString(),
@@ -122,7 +125,7 @@ export class BillService {
       
       return {
         ...bill,
-        status: 'completed',
+        status: 'completed' as const,
         approved_by: 1, // 模拟审核人
         approved_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -143,7 +146,7 @@ export class BillService {
       
       return {
         ...bill,
-        status: 'rejected',
+        status: 'rejected' as const,
         approved_by: 1,
         approved_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -227,10 +230,11 @@ export class BillService {
       return new Blob([pdfContent], { type: 'application/pdf' });
     }
     
-    const response = await apiService.post('/export/pdf', params, {
+    const response = await apiService.post<Blob>('/export/pdf', { 
+      ...params,
       responseType: 'blob'
     });
-    return response.data;
+    return response.data as Blob;
   }
 }
 

@@ -189,3 +189,24 @@ export interface Notification {
     action: () => void;
   }[];
 }
+
+// 个人资料弹窗相关类型
+export interface ProfileDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  user?: User;
+}
+
+export interface AdminProfileFormData {
+  name: string;
+  email: string;
+  phone: string;
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+export interface PasswordUpdateData {
+  old_password: string;
+  new_password: string;
+}

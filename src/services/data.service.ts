@@ -18,9 +18,8 @@ import {
   ExportPDFParams
 } from '../types';
 import apiService from './api.service';
-
-// 模拟延迟函数
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { delay } from '../utils';
+import { BillService, FileService } from './bill.service';
 
 // 认证服务
 export class AuthService {
@@ -66,8 +65,8 @@ export class AuthService {
         name: data.name,
         phone: data.phone,
         email: data.email,
-        role: 'user',
-        status: 'active',
+        role: 'user' as const,
+        status: 'active' as const,
         created_at: new Date().toISOString()
       };
       
@@ -88,7 +87,14 @@ export class AuthService {
   static async getCurrentUser(): Promise<User> {
     if (API_CONFIG.USE_MOCK_DATA) {
       await delay(500);
-      return MOCK_CURRENT_USER;
+      
+      // 从localStorage获取当前用户信息
+      const savedUser = localStorage.getItem('finance_system_user');
+      if (savedUser) {
+        return JSON.parse(savedUser);
+      }
+      
+      throw new Error('未登录');
     }
     
     const response = await apiService.get<User>('/auth/me');
@@ -174,3 +180,89 @@ export class ProfileService {
     return response.data!;
   }
 }
+
+// 统计数据接口
+interface StatisticsOverview {
+  users: {
+    total: number;
+    active: number;
+    inactive: number;
+    admins: number;
+    normalUsers: number;
+    todayNew: number;
+    weekNew: number;
+    monthNew: number;
+  };
+  bills: {
+    total: number;
+    totalAmount: number;
+    pending: number;
+    completed: number;
+    rejected: number;
+    todayCount: number;
+    todayAmount: number;
+    weekCount: number;
+    weekAmount: number;
+    monthCount: number;
+    monthAmount: number;
+  };
+}
+
+// 统计服务
+export class StatisticsService {
+  // 获取统计概览
+  static async getOverview(): Promise<StatisticsOverview> {
+    if (API_CONFIG.USE_MOCK_DATA) {
+      await delay(800);
+      
+      // 使用模拟数据计算统计信息
+      const users = MOCK_USERS;
+      const bills = MOCK_BILLS;
+      
+      // 计算用户统计
+      const userStats = {
+        total: users.length,
+        active: users.filter(u => u.status === 'active').length,
+        inactive: users.filter(u => u.status === 'inactive').length,
+        admins: users.filter(u => u.role === 'admin').length,
+        normalUsers: users.filter(u => u.role === 'user').length,
+        todayNew: 1, // 模拟数据
+        weekNew: 3,  // 模拟数据
+        monthNew: 8  // 模拟数据
+      };
+
+      // 计算账单统计
+      const billStats = {
+        total: bills.length,
+        totalAmount: bills.reduce((sum, bill) => sum + bill.amount, 0),
+        pending: bills.filter((b: Bill) => b.status === ('pending' as Bill['status'])).length,
+        completed: bills.filter((b: Bill) => b.status === ('completed' as Bill['status'])).length,
+        rejected: bills.filter((b: Bill) => b.status === ('rejected' as Bill['status'])).length,
+        todayCount: 2,  // 模拟数据
+        todayAmount: 4300.00,  // 模拟数据
+        weekCount: 8,   // 模拟数据
+        weekAmount: 15800.00,  // 模拟数据
+        monthCount: 25, // 模拟数据
+        monthAmount: 45600.00  // 模拟数据
+      };
+
+      return {
+        users: userStats,
+        bills: billStats
+      };
+    }
+    
+    const response = await apiService.get<StatisticsOverview>('/statistics/overview');
+    return response.data!;
+  }
+}
+
+// 导出服务集合
+export const DataService = {
+  auth: AuthService,
+  user: UserService,
+  profile: ProfileService,
+  statistics: StatisticsService,
+  bill: BillService,
+  file: FileService
+};

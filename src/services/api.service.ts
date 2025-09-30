@@ -1,167 +1,100 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { API_CONFIG, API_ENDPOINTS, HTTP_STATUS, ERROR_MESSAGES } from '../config';
-import { ApiResponse, ApiErrorResponse } from '../types';
-import toast from 'react-hot-toast';
+import axios, { AxiosResponse } from 'axios';
+import { API_CONFIG } from '../config';
 
-// 创建 axios 实例
+interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+interface RequestConfig {
+  responseType?: 'json' | 'blob' | 'text' | 'arraybuffer';
+}
+
 class ApiService {
-  private api: AxiosInstance;
+  private baseURL: string;
 
   constructor() {
-    this.api = axios.create({
-      baseURL: API_CONFIG.BASE_URL,
-      timeout: API_CONFIG.TIMEOUT,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // 请求拦截器
-    this.api.interceptors.request.use(
-      (config) => {
-        const token = this.getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-
-    // 响应拦截器
-    this.api.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
-      (error: AxiosError) => {
-        this.handleError(error);
-        return Promise.reject(error);
-      }
-    );
+    this.baseURL = API_CONFIG.BASE_URL;
   }
 
-  // 获取保存的token
-  private getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('finance_system_token');
-    }
-    return null;
+  private getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
   }
 
-  // 保存token
-  setToken(token: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('finance_system_token', token);
+  async get<T>(url: string, params?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse = await axios.get(`${this.baseURL}${url}`, {
+        params,
+        headers: this.getHeaders(),
+        responseType: config?.responseType
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message);
     }
   }
 
-  // 清除token
-  clearToken(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('finance_system_token');
-      localStorage.removeItem('finance_system_user');
+  async post<T>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse = await axios.post(`${this.baseURL}${url}`, data, {
+        headers: this.getHeaders(),
+        responseType: config?.responseType
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message);
     }
   }
 
-  // 错误处理
-  private handleError(error: AxiosError): void {
-    let message = ERROR_MESSAGES.NETWORK_ERROR;
+  async put<T>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse = await axios.put(`${this.baseURL}${url}`, data, {
+        headers: this.getHeaders(),
+        responseType: config?.responseType
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+  }
 
-    if (error.response) {
-      const status = error.response.status;
-      const errorData = error.response.data as ApiErrorResponse;
+  async delete<T>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse = await axios.delete(`${this.baseURL}${url}`, {
+        headers: this.getHeaders(),
+        responseType: config?.responseType
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+  }
+
+  async upload(file: File, type: 'image' | 'document'): Promise<ApiResponse<{ file_url: string }>> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
       
-      switch (status) {
-        case HTTP_STATUS.UNAUTHORIZED:
-          message = ERROR_MESSAGES.UNAUTHORIZED;
-          this.clearToken();
-          // 跳转到登录页
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
-          break;
-        case HTTP_STATUS.FORBIDDEN:
-          message = ERROR_MESSAGES.FORBIDDEN;
-          break;
-        case HTTP_STATUS.NOT_FOUND:
-          message = ERROR_MESSAGES.NOT_FOUND;
-          break;
-        case HTTP_STATUS.BAD_REQUEST:
-          message = errorData?.message || ERROR_MESSAGES.VALIDATION_ERROR;
-          break;
-        case HTTP_STATUS.INTERNAL_SERVER_ERROR:
-          message = ERROR_MESSAGES.SERVER_ERROR;
-          break;
-        default:
-          message = errorData?.message || ERROR_MESSAGES.NETWORK_ERROR;
-      }
+      const uploadUrl = type === 'image' ? '/upload/image' : '/upload/document';
+      // 直接构建需要的 headers，而不是删除属性
+      const headers = {
+        ...this.getHeaders(),
+        Authorization: this.getHeaders().Authorization // 保留认证信息
+      };
+      
+      const response: AxiosResponse = await axios.post(`${this.baseURL}${uploadUrl}`, formData, {
+        headers
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message);
     }
-
-    toast.error(message);
-  }
-
-  // GET 请求
-  async get<T>(url: string, params?: any): Promise<ApiResponse<T>> {
-    const response = await this.api.get(url, { params });
-    return response.data;
-  }
-
-  // POST 请求
-  async post<T>(url: string, data?: any): Promise<ApiResponse<T>> {
-    const response = await this.api.post(url, data);
-    return response.data;
-  }
-
-  // PUT 请求
-  async put<T>(url: string, data?: any): Promise<ApiResponse<T>> {
-    const response = await this.api.put(url, data);
-    return response.data;
-  }
-
-  // DELETE 请求
-  async delete<T>(url: string): Promise<ApiResponse<T>> {
-    const response = await this.api.delete(url);
-    return response.data;
-  }
-
-  // 文件上传
-  async upload(file: File, type: 'image' | 'document' = 'image'): Promise<ApiResponse<{ file_url: string; file_name: string }>> {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await this.api.post(
-      type === 'image' ? API_ENDPOINTS.UPLOAD.IMAGE : API_ENDPOINTS.UPLOAD.DOCUMENT,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
-    
-    return response.data;
-  }
-
-  // 下载文件
-  async download(url: string, filename?: string): Promise<void> {
-    const response = await this.api.get(url, {
-      responseType: 'blob',
-    });
-
-    const blob = new Blob([response.data]);
-    const downloadUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = filename || 'download';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(downloadUrl);
   }
 }
 
-// 导出单例
-export const apiService = new ApiService();
-export default apiService;
+export default new ApiService();

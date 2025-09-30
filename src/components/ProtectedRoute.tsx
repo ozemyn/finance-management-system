@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 import { PageLoading } from './ui/Loading';
+import { ROUTES, getDefaultHomePage } from '../constants/routes';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,18 +24,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (!loading) {
       // 用户未登录
       if (!user) {
-        router.push('/login');
+        router.push(ROUTES.LOGIN);
         return;
       }
 
       // 检查角色权限
       if (requiredRole && user.role !== requiredRole) {
-        // 根据用户角色跳转到适当的页面
-        if (user.role === 'admin') {
-          router.push('/admin/users');
-        } else {
-          router.push('/profile');
-        }
+        // 根据用户角色跳转到对应的首页
+        router.push(getDefaultHomePage(user.role));
         return;
       }
 
@@ -72,12 +69,8 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 
   useEffect(() => {
     if (!loading && user) {
-      // 已登录用户根据角色跳转
-      if (user.role === 'admin') {
-        router.push('/admin/users');
-      } else {
-        router.push('/profile');
-      }
+      // 已登录用户跳转到对应角色的首页
+      router.push(getDefaultHomePage(user.role));
     }
   }, [user, loading, router]);
 

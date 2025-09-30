@@ -1,17 +1,26 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../hooks/useAuth';
 import { Toaster } from 'react-hot-toast';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+});
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: '财务管理系统',
   description: '专业的财务管理和账单处理系统',
   keywords: '财务管理,账单系统,管理系统',
   authors: [{ name: 'MiniMax Agent' }],
-  viewport: 'width=device-width, initial-scale=1',
 };
 
 export default function RootLayout({

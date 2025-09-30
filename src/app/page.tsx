@@ -1,31 +1,27 @@
 'use client';
 
-import { useAuth } from '../hooks/useAuth';
-import { Loading } from '../components';
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { PageLoading } from '@/components/ui/Loading';
+import { ROUTES, getDefaultHomePage } from '@/constants/routes';
 
-export default function HomePage() {
-  const { user, loading } = useAuth();
+export default function Home() {
   const router = useRouter();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
-        // 根据用户角色跳转到相应页面
-        if (user.role === 'admin') {
-          router.push('/admin/users');
-        } else {
-          router.push('/profile');
-        }
+      if (!user) {
+        // 未登录，重定向到登录页
+        router.replace(ROUTES.LOGIN);
       } else {
-        // 未登录用户跳转到登录页
-        router.push('/login');
+        // 已登录，根据角色重定向到对应的首页
+        router.replace(getDefaultHomePage(user.role));
       }
     }
   }, [user, loading, router]);
 
-  return (
-    <Loading />
-  );
+  // 显示加载状态
+  return <PageLoading message="页面加载中..." />;
 }

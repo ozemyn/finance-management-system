@@ -188,7 +188,7 @@ export default function AdminUsersPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6"
           >
             <StatCard
               title="总用户数"
@@ -219,7 +219,7 @@ export default function AdminUsersPage() {
             transition={{ delay: 0.2 }}
           >
             <Card>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div className="flex-1">
                   <Input
                     placeholder="搜索用户姓名、邮箱或手机号"
@@ -229,7 +229,7 @@ export default function AdminUsersPage() {
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   />
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2 sm:gap-3">
                   <Button
                     variant="primary"
                     icon={Search}

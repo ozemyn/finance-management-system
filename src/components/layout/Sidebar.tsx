@@ -13,7 +13,8 @@ import {
   Settings,
   CreditCard,
   PlusCircle,
-  Eye
+  Eye,
+  Home
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { MenuItem } from '@/types';
@@ -21,15 +22,32 @@ import { MenuItem } from '@/types';
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  customMenuItems?: MenuItem[];
+  hasPermission?: (item: MenuItem, userRole?: string) => boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  isOpen = true,
+  onClose,
+  customMenuItems,
+  hasPermission = (item: MenuItem, userRole?: string) => {
+    if (!item.role) return true;
+    return item.role === userRole;
+  }
+}) => {
   const { user } = useAuth();
   const pathname = usePathname();
 
   // 菜单配置
-  const menuItems: MenuItem[] = [
+  const defaultMenuItems: MenuItem[] = [
     // 管理员菜单
+    {
+      id: 'admin-dashboard',
+      title: '首页',
+      icon: Home,
+      path: '/admin',
+      role: 'admin'
+    },
     {
       id: 'user-management',
       title: '用户管理',
@@ -97,13 +115,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     }
   ];
 
-  // 根据用户角色过滤菜单
-  const filteredMenuItems = menuItems.filter(item => {
-    if (!item.role) return true;
-    return item.role === user?.role;
-  });
+  // 使用自定义菜单或默认菜单
+  const menuItems = customMenuItems || defaultMenuItems;
+
+  // 根据用户角色和权限函数过滤菜单
+  const filteredMenuItems = menuItems.filter(item => hasPermission(item, user?.role));
 
   const isItemActive = (path: string) => {
+    if (path === '/admin' && pathname !== '/admin') {
+      return false;
+    }
     return pathname === path || pathname.startsWith(path + '/');
   };
 
@@ -111,7 +132,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     <>
       {/* 桌面端侧边栏 */}
       <motion.aside
-        className={`ios-sidebar ${isOpen ? 'translate-x-0' : '-translate-x-full'} hidden md:block`}
+        className={`fixed top-0 left-0 h-screen w-64 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-r border-gray-100 dark:border-gray-700 pt-16 hidden md:block ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
         initial={false}
         animate={{ x: isOpen ? 0 : -256 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}

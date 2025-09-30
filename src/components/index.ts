@@ -7,6 +7,7 @@ export { Card, StatCard } from './ui/Card';
 export { Modal, ConfirmModal } from './ui/Modal';
 export { Loading, PageLoading, ContentLoading, TableLoading, Skeleton } from './ui/Loading';
 export { Table } from './ui/Table';
+export * from './DateRangePicker';
 
 // 布局组件
 export { Layout, AuthLayout } from './layout/Layout';
